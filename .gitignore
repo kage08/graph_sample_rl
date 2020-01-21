@@ -1,0 +1,14 @@
+*.log
+*.pyc
+.vscode/*
+*.pth
+*.csv
+*.RData
+runs/*
+runs1/*
+*.pkl
+!data/*/*.pkl
+*.npz
+__pycache__/*
+models/*
+logs/*
