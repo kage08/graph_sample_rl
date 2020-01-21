@@ -216,9 +216,7 @@ times_mean = args.times_mean
 noise_param = 1
 
 
-#g_path = args.graph_path
 #generate graph
-#g = random_sbm(n=n)
 graphs = []
 for g_path in g_paths:
     with open(g_path,'rb') as fl:
@@ -269,7 +267,6 @@ for g,seeds in zip(graphs, e_seeds_list):
     env = NetworkEnv(fullGraph=g, seeds=seeds, opt_reward=0, nop_r=args.nop_reward,
                 times_mean=args.times_mean_env, bad_reward=args.bad_reward, clip_max=args.max_reward, clip_min=args.min_reward ,normalize=args.norm_reward)
     envs.append(env)
-#replay = Buffer(BUFF_SIZE)
 replay = PriortizedReplay(BUFF_SIZE, 10, beta=0.6)
 
 logging.info('State Dimensions: '+str(action_dim))
@@ -314,15 +311,12 @@ def get_embeds(g):
         d[n]=str(n)
     g1 = nx.relabel_nodes(g,d)
     graph_model = DeepWalk(g1,num_walks= args.num_walks, walk_length=args.walk_len, workers=args.cpu if args.cpu>0 else cpu_count())
-    #graph_model = Struc2Vec(g1,num_walks= args.num_walks, walk_length=args.walk_len, workers=args.cpu if args.cpu>0 else cpu_count())
-    #graph_model = Node2Vec(g1,num_walks= args.num_walks, walk_length=args.walk_len, workers=args.cpu if args.cpu>0 else cpu_count(),p = 0.25, q = 4)
-    #graph_model = graphwave_alg(g); emb1 = {}; for c,n in enumerate(g.nodes): emb1[n] = graph_model[c]
+    
     graph_model.train(window_size = args.win, iter=args.emb_iters, embed_size=action_dim)
     embs = {}
     emb1 = graph_model.get_embeddings()
     for n in emb1.keys():
         embs[int(n)] = emb1[n]
-        #embs[int(n)] = emb1[n]/np.linalg.norm(emb1[n])
 
     return embs
 
@@ -482,10 +476,6 @@ try:
             writer.add_scalar('Norm Reward', tot_r1, ep+1)
 
         
-        #logging.info(str(acmodel.q_predicted1[:2]))
-        #logging.info(str(acmodel.r))
-        #logging.info(str(acmodel.action_chosen[:2]))
-        #logging.info(str(acmodel.a_predicted[:2]))
         gc.collect()
             
         
